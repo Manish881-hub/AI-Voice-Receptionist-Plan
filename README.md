@@ -4,9 +4,7 @@ An intelligent AI-powered voice receptionist for **Tattvam in The Hills Retreat 
 
 ## Demo
 
-<video src="media/ai-receptionist.mp4" controls width="100%" poster="media/ai-receptionist-poster.jpg"></video>
-
-> [Download the demo video](media/ai-receptionist.mp4)
+![Demo](media/ai-receptionist.mp4)
 
 ## Features
 
