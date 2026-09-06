@@ -223,3 +223,6 @@ ehthumbs.db
 
 # GitHub CLI
 .github/personal-instructions.md
+
+# Local reservation store (runtime data, never commit real guest bookings)
+data/reservations.json
