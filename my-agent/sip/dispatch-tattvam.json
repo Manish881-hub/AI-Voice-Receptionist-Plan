@@ -1,0 +1,15 @@
+{
+  "name": "tattvam-inbound",
+  "description": "Inbound carrier calls -> per-call room tattvam-<caller> + dispatch my-agent. Room name is the call-correlation id (SIP Call-ID -> room -> job).",
+  "rule": {
+    "type": "individual",
+    "roomPrefix": "tattvam-",
+    "agentName": "my-agent"
+  },
+  "notes": [
+    "Create via LiveKit Cloud dashboard -> SIP -> Dispatch Rules, or via API with this payload.",
+    "Pair with an inbound trunk: Twilio trial number, auth by IP/creds, codec forced to G.711 mu-law.",
+    "Each caller gets its own room + isolated agent session; concurrent callers do NOT share state.",
+    "Outbound trunk (same provider) is required later for SIP REFER transfer to +91 80500 53808."
+  ]
+}
