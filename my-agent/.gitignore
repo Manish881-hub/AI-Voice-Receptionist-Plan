@@ -226,3 +226,11 @@ ehthumbs.db
 
 # Local reservation store (runtime data, never commit real guest bookings)
 data/reservations.json
+
+# Keep architecture decision records tracked
+!docs/
+!docs/adr/
+!docs/adr/*.md
+
+# Local Sarvam voice QA artifacts
+sarvam-test-*.wav
