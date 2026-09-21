@@ -78,3 +78,15 @@ export const PACKAGES: Record<PackageType, PackageInfo> = {
     includes: 'Candle-night dinners, anniversary and birthday setups, family get-together arrangements',
   },
 };
+
+export interface OfferInfo {
+  id: string;
+  title: string;
+  deal: string;
+  details?: string;
+}
+
+// Live coupons/discounts. The ONLY source the agent may quote — it must call
+// getCurrentOffers and never invent offers. Empty = "no current offers".
+// Add seasonal entries here (e.g. { id: 'diwali-2026', title: ..., deal: ... }).
+export const OFFERS: OfferInfo[] = [];

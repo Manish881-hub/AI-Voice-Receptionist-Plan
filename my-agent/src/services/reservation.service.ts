@@ -181,6 +181,22 @@ export function checkAvailability(q: AvailabilityQuery): AvailabilityResult {
   return { checkIn: q.checkIn, checkOut: q.checkOut, nights: nights.length, guests: q.guests, rooms };
 }
 
+/** Normalize an Indian callback number to 10 digits, or '' when not given.
+ * Throws a voice-safe message when digits are missing/wrong — STT often drops
+ * or adds digits on spoken numbers, so never store a partial number. */
+export function normalizePhone(raw: string | undefined): string {
+  const text = (raw ?? '').trim();
+  if (text === '') return '';
+  let digits = text.replace(/\D/g, '');
+  if (digits.length === 12 && digits.startsWith('91')) digits = digits.slice(2);
+  if (digits.length !== 10) {
+    throw new Error(
+      'The phone number needs exactly 10 digits. Please ask the guest to repeat it slowly, digit by digit.',
+    );
+  }
+  return digits;
+}
+
 function newConfirmationCode(existing: Set<string>): string {
   for (let i = 0; i < 50; i++) {
     const code = `BOOK-${Math.floor(10000 + Math.random() * 90000)}`;
@@ -205,7 +221,7 @@ export function createReservation(input: CreateReservationInput): Reservation {
   const reservation: Reservation = {
     confirmationCode: code,
     guestName: name,
-    phone: (input.phone ?? '').trim(),
+    phone: normalizePhone(input.phone),
     checkIn: input.checkIn,
     checkOut: input.checkOut,
     roomType: input.roomType ?? 'deluxe',

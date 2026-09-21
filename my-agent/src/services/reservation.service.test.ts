@@ -119,3 +119,33 @@ describe('reservation.service', () => {
     ).toThrow();
   });
 });
+
+describe('phone validation', () => {
+  const base = {
+    checkIn: FUTURE_IN,
+    checkOut: FUTURE_OUT,
+    guests: 2,
+    roomType: 'deluxe',
+    guestName: 'Asha Sharma',
+  } as const;
+
+  it('rejects the 9-digit number from the 2026-09-21 live call', () => {
+    expect(() => createReservation({ ...base, phone: '536907707' })).toThrow(/10 digits/);
+  });
+
+  it('rejects short, long, and non-numeric numbers', () => {
+    expect(() => createReservation({ ...base, phone: '12345' })).toThrow(/10 digits/);
+    expect(() => createReservation({ ...base, phone: '75369077071' })).toThrow(/10 digits/);
+    expect(() => createReservation({ ...base, phone: 'not a number' })).toThrow(/10 digits/);
+  });
+
+  it('normalizes spoken formatting and stores digits only', () => {
+    const r = createReservation({ ...base, phone: '+91 75369 07707' });
+    expect(r.phone).toBe('7536907707');
+  });
+
+  it('still allows booking without a phone number', () => {
+    const r = createReservation({ ...base });
+    expect(r.phone).toBe('');
+  });
+});

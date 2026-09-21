@@ -4,6 +4,7 @@ import {
   cancelReservation,
   checkRoomAvailability,
   createReservation,
+  getCurrentOffers,
   getPackageDetails,
   modifyReservation,
   requestHumanHandoff,
@@ -21,6 +22,7 @@ export class Agent extends voice.Agent {
 
       tools: {
         getPackageDetails,
+        getCurrentOffers,
         checkRoomAvailability,
         createReservation,
         modifyReservation,
