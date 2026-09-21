@@ -1,4 +1,5 @@
 allowBuilds:
+  '@ffmpeg-installer/linux-x64': false
   '@livekit/local-inference': true
   protobufjs: true
   sharp: true

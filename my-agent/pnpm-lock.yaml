@@ -11,6 +11,9 @@ importers:
       '@livekit/agents':
         specifier: ^1.4.7
         version: 1.4.11(@livekit/rtc-node@0.13.29)(typescript@5.9.3)(zod@3.25.76)
+      '@livekit/agents-plugin-sarvam':
+        specifier: ~1.9.0
+        version: 1.9.0(@livekit/agents@1.4.11(@livekit/rtc-node@0.13.29)(typescript@5.9.3)(zod@3.25.76))(@livekit/rtc-node@0.13.29)
       '@livekit/plugins-ai-coustics':
         specifier: ^0.2.14
         version: 0.2.15(@livekit/agents@1.4.11(@livekit/rtc-node@0.13.29)(typescript@5.9.3)(zod@3.25.76))(@livekit/rtc-node@0.13.29)
@@ -372,6 +375,12 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@livekit/agents-plugin-sarvam@1.9.0':
+    resolution: {integrity: sha512-4K8xsqqnJkQf7urVVZYzvG+u9wt7ncTu621LtKLFnP+MChm7deGAe459qmW9a9A8VWa06n1e+ty08+QorfhbJQ==}
+    peerDependencies:
+      '@livekit/agents': 1.9.0
+      '@livekit/rtc-node': ^0.13.34
 
   '@livekit/agents@1.4.11':
     resolution: {integrity: sha512-gM1/+hJ3xPTV3rAVaR0PK4uNJyhh6Z4Ut5RB+RSAvEm3m8UkelCXWapf6AG8VOvGMhO3SxLlaDHb0GcwVYu7Lw==}
@@ -2320,6 +2329,15 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@livekit/agents-plugin-sarvam@1.9.0(@livekit/agents@1.4.11(@livekit/rtc-node@0.13.29)(typescript@5.9.3)(zod@3.25.76))(@livekit/rtc-node@0.13.29)':
+    dependencies:
+      '@livekit/agents': 1.4.11(@livekit/rtc-node@0.13.29)(typescript@5.9.3)(zod@3.25.76)
+      '@livekit/rtc-node': 0.13.29
+      ws: 8.21.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   '@livekit/agents@1.4.11(@livekit/rtc-node@0.13.29)(typescript@5.9.3)(zod@3.25.76)':
     dependencies:

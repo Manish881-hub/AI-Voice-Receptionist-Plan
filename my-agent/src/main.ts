@@ -1,4 +1,5 @@
 import { ServerOptions, cli, defineAgent, inference, voice } from '@livekit/agents';
+import * as sarvam from '@livekit/agents-plugin-sarvam';
 import { audioEnhancement } from '@livekit/plugins-ai-coustics';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'node:url';
@@ -37,10 +38,16 @@ export default defineAgent({
     const startedAt = Date.now();
     console.log(`[call ${callId}] job started`);
     let lastFinalTranscriptAt = 0;
-    // Set up a voice AI pipeline using OpenAI, Cartesia, Deepgram, and the LiveKit turn detector
+    // TTS provider switch (ADR 001): 'sarvam' for Bulbul v3 evaluation,
+    // 'cartesia' for the pre-Sarvam fallback. STT stays on Deepgram Nova-3
+    // in this slice — do NOT add Sarvam STT or language routing yet.
+    const ttsProvider = (process.env.TTS_PROVIDER ?? 'sarvam').toLowerCase();
+    console.log(`[call ${callId}] tts_provider=${ttsProvider}`);
+    // Set up a voice AI pipeline using OpenAI, Cartesia/Sarvam, Deepgram, and the LiveKit turn detector
     const session = new voice.AgentSession({
       // Speech-to-text (STT) is your agent's ears, turning the user's speech into text that the LLM can understand
       // See all available models at https://docs.livekit.io/agents/models/stt/
+      // SLICE: STT intentionally unchanged (Deepgram). Sarvam STT comes later.
       stt: new inference.STT({
         model: 'deepgram/nova-3',
         // Pinned to Indian English: 'multi' let auto-detect flip short
@@ -51,10 +58,27 @@ export default defineAgent({
 
       // Text-to-speech (TTS) is your agent's voice, turning the LLM's text into speech that the user can hear
       // See all available models as well as voice selections at https://docs.livekit.io/agents/models/tts/
-      tts: new inference.TTS({
-        model: 'cartesia/sonic-3',
-        voice: '9626c31c-bec5-4cca-baa8-f8ba9e84c8bc',
-      }),
+      // ADR 001: realtime path uses the official Sarvam Node plugin
+      // (streaming, turn-taking, barge-in). Cartesia remains the fallback.
+      tts:
+        ttsProvider === 'cartesia'
+          ? new inference.TTS({
+              model: 'cartesia/sonic-3',
+              voice: '9626c31c-bec5-4cca-baa8-f8ba9e84c8bc',
+            })
+          : new sarvam.TTS({
+              targetLanguageCode: 'hi-IN',
+              model: 'bulbul:v3',
+              speaker: 'shubh',
+              pace: 1.0,
+              temperature: 0.6,
+              // LiveKit eval 2026-09-21: native WS streaming timed out
+              // (APIConnectionError, retryable, body null) so no audio
+              // played. REST synthesis is proven reachable from here
+              // (src/scripts/test-sarvam.ts), so prefer it until WS is
+              // diagnosed. Costs a little first-byte latency.
+              streaming: false,
+            }),
 
       // Turn detection determines when the user is speaking and when the agent should respond.
       // The LiveKit audio turn detector is a multimodal model that encodes the user's audio
@@ -68,7 +92,13 @@ export default defineAgent({
         // Wait a beat longer before closing a turn: 300ms was splitting
         // pausing speakers into fragments ("The guest will be around" +
         // "two of guests."). 600ms costs a little responsiveness.
-        endpointing: { minDelay: 600 },
+        // 2026-09-21: raised to 800ms — live log showed late STT finals
+        // ("eou detection ran after the audio eot turn was already flushed",
+        // "Yes."/"Please." double-turn with a cancelled LLM call).
+        // ROLLBACK/retune criteria: compare false-turn rate, barge-in
+        // failures, ttfa, and cancelled-LLM count across 600/800/1000ms.
+        // Revert to 600 if ttfa regresses without fewer double-turns.
+        endpointing: { minDelay: 800 },
       },
     });
 
